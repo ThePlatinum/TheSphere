@@ -15,14 +15,19 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
+        $intended =
+            $request->expectsJson() ?
+            config('app.frontend_url').RouteServiceProvider::HOME.'?verified=1' :
+            RouteServiceProvider::HOME.'?verified=1';
+
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+            return redirect()->intended($intended);
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
-        return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+        return redirect()->intended($intended);
     }
 }
