@@ -32,6 +32,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'created_at',
+        'updated_at',
     ];
 
     /**
@@ -43,4 +45,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    function sources() {
+        return $this->belongsToMany(Source::class);
+    }
+
+    function categories() {
+        return $this->belongsToMany(Category::class);
+    }
 }
