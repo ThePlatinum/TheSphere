@@ -15,6 +15,7 @@ trait NewsTrait
     }
 
     function storeFeed(array $feed): Feed {
+
         $attributes = [
             'url' => $feed['url'],
             'title' => $feed['title']

@@ -16,7 +16,7 @@ class NewsApi implements CollectorInterface
     private const FETCH_URL = 'https://newsapi.org/v2/everything';
     private const ID = 1;
 
-    private $collectorInstance ;
+    private $collectorInstance;
 
     public function __constructor()
     {
@@ -57,7 +57,7 @@ class NewsApi implements CollectorInterface
     /**
      * Normalise News
      */
-    public function normalizeNews($news): array
+    public function normalizeNews($news): ?array
     {
         $source = $this->createSource($news['source']['name']);
 

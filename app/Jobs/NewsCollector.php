@@ -2,9 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\CollectorException;
 use App\Http\Controllers\Aggregator\CollectorFactory;
 use App\Models\Category;
 use App\Traits\NewsTrait;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -42,7 +44,7 @@ class NewsCollector implements ShouldQueue
         foreach ($categories as $category) {
             // TODO: Split each categories in seperate jobs and
             // queue with delays for previous categories
-            
+
             // For each category, call the getNews and get the news
             $arrayOfNews = $collectorClassInstance->getNews($category->name);
 
@@ -50,13 +52,21 @@ class NewsCollector implements ShouldQueue
                 // For each news,
                 $readyNewsFeed = $collectorClassInstance->normalizeNews($news);
 
-                // Check if all keys have values and are not null
-                if (count(array_filter($readyNewsFeed)) === count($readyNewsFeed)) {
-                    // Check if news exists before or store News
-                    $feed = $this->storeFeed($readyNewsFeed);
-                    $feed->categories()->attach($category);
-                }
+                if (!empty($readyNewsFeed))
+
+                    // Check if all keys have values and are not null
+                    if (count(array_filter($readyNewsFeed)) === count($readyNewsFeed)) {
+                        // Check if news exists before or store News
+                        $feed = $this->storeFeed($readyNewsFeed);
+                        $feed->categories()->attach($category);
+                    }
             }
         }
+    }
+
+    public function failed(Exception $exception)
+    {
+        // Log the exception or perform any other desired actions
+        throw new CollectorException($exception->getMessage(), []);
     }
 }

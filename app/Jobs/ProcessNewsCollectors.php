@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Exceptions\CollectorException;
 use App\Models\Collector;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,5 +36,11 @@ class ProcessNewsCollectors implements ShouldQueue
             // Dispatch a separate job for each collector
             NewsCollector::dispatch($collector);
         }
+    }
+
+    public function failed(Exception $exception)
+    {
+        // Log the exception or perform any other desired actions
+        throw new CollectorException($exception->getMessage(), []);
     }
 }

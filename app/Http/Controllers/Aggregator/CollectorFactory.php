@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Aggregator;
 
 use App\Exceptions\CollectorException;
 use App\Http\Controllers\Aggregator\CollectorInterface;
+use App\Http\Controllers\Aggregator\Collectors\Guardian;
 use App\Http\Controllers\Aggregator\Collectors\NewsApi;
 use App\Http\Controllers\Aggregator\Collectors\NYNews;
 use App\Models\Collector;
@@ -14,6 +15,7 @@ class CollectorFactory
     protected static $collectorClasses = [
         1 => NewsApi::class,
         2 => NYNews::class,
+        3 => Guardian::class
     ];
 
     /**

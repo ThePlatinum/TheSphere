@@ -12,7 +12,7 @@ interface CollectorInterface
     /**
      * Normalise News
      */
-    public function normalizeNews($news): array;
+    public function normalizeNews($news): ?array;
 
     /**
      * Notify End of operation
