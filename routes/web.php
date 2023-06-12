@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\CollectorController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,5 +33,8 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 });
+
+
+Route::get('/ny-news', [CollectorController::class, 'store'] );
 
 require __DIR__ . '/auth.php';
