@@ -17,6 +17,7 @@ class CollectorSeeder extends Seeder
         $collectors = [
             ['name' => 'NewsAPI', 'code' => 1],
             ['name' => 'NYNews', 'code' => 2],
+            ['name' => 'GUARDIAN', 'code' => 3],
         ];
 
         foreach ($collectors as $collector) {

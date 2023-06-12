@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Aggregator\CollectorFactory;
+use App\Jobs\ProcessNewsCollectors;
+use App\Models\Category;
 use App\Models\Collector;
+use App\Traits\NewsTrait;
 use Illuminate\Http\Request;
 
 class CollectorController extends Controller
 {
+    use NewsTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -28,7 +34,7 @@ class CollectorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        ProcessNewsCollectors::dispatch();
     }
 
     /**
