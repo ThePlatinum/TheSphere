@@ -4,31 +4,47 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function allCategories()
     {
         return response()->json(Category::all());
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show users categories preferences
      */
-    public function create()
+    public function userCategories()
     {
-        //
+        $user = Auth::user();
+
+        if ($user) {
+            $userCategories = $user->categories;
+
+            if ($userCategories->isEmpty()) {
+                return $this->allCategories();
+            }
+
+            return response()->json($userCategories);
+        }
+
+        return $this->allCategories();
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store users categories preference
      */
     public function store(Request $request)
     {
-        //
+        $user = $request->user();
+        $user->categories()->sync($request->categories);
+
+        return response()->json(true);
     }
 
     /**
