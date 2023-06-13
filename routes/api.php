@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\SourceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,5 +27,14 @@ Route::controller(CategoryController::class)->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('user/categories', 'store');
+    });
+});
+
+Route::controller(SourceController::class)->group(function () {
+    Route::get('sources', 'allSources');
+    Route::get('user/sources', 'userSources');
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('user/sources', 'store');
     });
 });

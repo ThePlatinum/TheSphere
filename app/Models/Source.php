@@ -24,5 +24,11 @@ class Source extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
+        'feeds'
     ];
+
+    public function feeds()
+    {
+        return $this->belongsToMany(Feed::class);
+    }
 }

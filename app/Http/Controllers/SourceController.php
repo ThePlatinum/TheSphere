@@ -4,31 +4,47 @@ namespace App\Http\Controllers;
 
 use App\Models\Source;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SourceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function allSources()
     {
-        //
+        return response()->json(Source::all());
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show users Sources preferences
      */
-    public function create()
+    public function userSources()
     {
-        //
+        $user = Auth::user();
+
+        if ($user) {
+            $userSources = $user->sources;
+
+            if ($userSources->isEmpty()) {
+                return $this->allSources();
+            }
+
+            return response()->json($userSources);
+        }
+
+        return $this->allSources();
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store users Sources preference
      */
     public function store(Request $request)
     {
-        //
+        $user = $request->user();
+        $user->sources()->sync($request->sources);
+
+        return response()->json(true);
     }
 
     /**

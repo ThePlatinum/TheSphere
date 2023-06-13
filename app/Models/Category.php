@@ -32,7 +32,6 @@ class Category extends Model
         return $this->belongsToMany(Feed::class);
     }
 
-
     public function getViewCountAttribute()
     {
         return $this->feeds->sum('view');
