@@ -35,6 +35,8 @@ class CollectorController extends Controller
     public function store(Request $request)
     {
         ProcessNewsCollectors::dispatch();
+
+        return "Good, Fetching news... Pleas, start the queue work if you have not";
     }
 
     /**
