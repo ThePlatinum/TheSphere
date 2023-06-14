@@ -9,12 +9,12 @@ use App\Traits\NewsTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
-class NYNews implements CollectorInterface
+class Guardian implements CollectorInterface
 {
     use NewsTrait;
 
-    private const FETCH_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
-    private const ID = 2;
+    private const FETCH_URL = "https://content.guardianapis.com/search";
+    private const ID = 3;
 
     private $collectorInstance;
 
@@ -30,19 +30,21 @@ class NYNews implements CollectorInterface
      */
     public function getNews(string $category): array
     {
-
         try {
             $response = Http::get(
                 self::FETCH_URL,
                 [
-                    'api-key' => config('collector.NYNEWS_SECRET_KEY'),
+                    'api-key' => config('collector.GUARDIAN_SECRET_KEY'),
                     'q' => $category,
-                    'begin_date' => now()->subDay()->format('Ymd')
+                    'from-date' => now()->subDay()->format('Y-m-d'),
+                    'order-by' => 'relevance',
+                    'show-fields' => 'thumbnail,body',
+                    'page-size' => '30'
                 ]
             );
 
             if ($response->successful()) {
-                $newsData = $response->json()['response']['docs'];
+                $newsData = $response->json()['response']['results'];
 
                 return $newsData;
             }
@@ -58,17 +60,17 @@ class NYNews implements CollectorInterface
      */
     public function normalizeNews($news): ?array
     {
-        if ($news['type_of_material'] == "News" && isset($news['multimedia'][0])) {
-            $source = $this->createSource($news['source']);
+        if (isset($news['fields']['body']) && isset($news['fields']['thumbnail'])) {
+            $source = $this->createSource("The Guardian");
 
             return [
-                'url' => $news['web_url'],
-                'title' => $news['headline']['main'],
+                'url' => $news['webUrl'],
+                'title' => $news['webTitle'],
                 'source_id' => $source->id,
                 'collector_id' => self::ID,
-                'image_url' => "https://static01.nyt.com/" . $news['multimedia'][0]['url'],
-                'description' => substr(strip_tags($news['lead_paragraph']), 0, 250),
-                'published_at' =>  Carbon::parse($news['pub_date'])->toDateTimeString(),
+                'image_url' => $news['fields']['thumbnail'],
+                'description' => substr(strip_tags($news['fields']['body']), 0, 250),
+                'published_at' =>  Carbon::parse($news['webPublicationDate'])->toDateTimeString(),
             ];
         }
 

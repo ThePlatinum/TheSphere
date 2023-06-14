@@ -35,6 +35,6 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
 });
 
 
-Route::get('/ny-news', [CollectorController::class, 'store'] );
+Route::get('/fetch-news', [CollectorController::class, 'store'] );
 
 require __DIR__ . '/auth.php';

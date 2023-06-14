@@ -58,7 +58,7 @@ class NewsCollector implements ShouldQueue
                     if (count(array_filter($readyNewsFeed)) === count($readyNewsFeed)) {
                         // Check if news exists before or store News
                         $feed = $this->storeFeed($readyNewsFeed);
-                        $feed->categories()->attach($category);
+                        $feed->categories()->sync($category);
                     }
             }
         }
