@@ -46,11 +46,21 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    function sources() {
+    function sources()
+    {
         return $this->belongsToMany(Source::class);
     }
 
-    function categories() {
+    function categories()
+    {
         return $this->belongsToMany(Category::class);
+    }
+
+    /**
+     * Get users who are not admins
+     */
+    public static function users()
+    {
+        return self::whereDoesntHave('roles')->get();
     }
 }

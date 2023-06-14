@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\CollectorController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Http;
+use App\Models\Category;
+use App\Models\Collector;
+use App\Models\Feed;
+use App\Models\Source;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\View;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +27,24 @@ Route::get('/', function () {
 Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
-        return view('dashboard');
+
+        $categories = Category::all();
+
+        $counts = (object) [
+            'users' => User::users()->count(),
+            'admins' => User::all()->count() - User::users()->count(),
+            'feeds' => Feed::all()->count(),
+            'categories' => $categories->count(),
+            'sources' => Source::all()->count(),
+            'collectors' => Collector::all()->count(),
+        ];
+
+        $category_views = "";
+        foreach ($categories as $category) {
+            $category_views .= "['" . $category->name . "'," . $category->view_count . "],";
+        }
+
+        return view('dashboard', compact('counts', 'category_views'));
     })->name('dashboard');
 
     Route::controller(ProfileController::class)->group(function () {
@@ -35,6 +55,6 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
 });
 
 
-Route::get('/fetch-news', [CollectorController::class, 'store'] );
+Route::get('/fetch-news', [CollectorController::class, 'store']);
 
 require __DIR__ . '/auth.php';
