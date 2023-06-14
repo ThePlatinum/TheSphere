@@ -20,7 +20,7 @@ class FeedController extends Controller
         $preferredCategories = $user->categories->pluck('id')->toArray();
         $preferredSources = $user->sources->pluck('id')->toArray();
 
-        $feeds = Feed::with('source')->whereHas('categories', function ($query) use ($preferredCategories, $preferredSources) {
+        $feeds = Feed::with('source', 'categories')->whereHas('categories', function ($query) use ($preferredCategories) {
             $query->whereIn('category_id', $preferredCategories);
         })
             ->get()
@@ -73,7 +73,6 @@ class FeedController extends Controller
         else $feeds = Feed::with('source', 'categories')->get();
 
         // TODO: Use cache for improvement
-
         $paginatedFeeds = $this->paginate($feeds, $perPage, $page);
 
         return $paginatedFeeds;
@@ -84,7 +83,13 @@ class FeedController extends Controller
      */
     public function popular()
     {
-        //
+        if (Auth::check()) $feeds = $this->userFeeds();
+
+        else $feeds = Feed::with('source', 'categories')->get();
+
+        $feedWithHighestViews = $feeds->sortByDesc('views')->first();
+
+        return response()->json($feedWithHighestViews);
     }
 
     /**
@@ -95,6 +100,7 @@ class FeedController extends Controller
         $feed = Feed::where('slug', $slug)->first();
 
         // Increase view count
+        // TODO: only count for each user once per minute
         $feed->update([
             'views' => $feed->views + 1
         ]);
