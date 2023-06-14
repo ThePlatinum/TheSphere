@@ -15,6 +15,7 @@ class NYNews implements CollectorInterface
 
     private const FETCH_URL = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
     private const ID = 2;
+    private const IMAGE_HOST = "https://static01.nyt.com/";
 
     private $collectorInstance;
 
@@ -66,8 +67,8 @@ class NYNews implements CollectorInterface
                 'title' => $news['headline']['main'],
                 'source_id' => $source->id,
                 'collector_id' => self::ID,
-                'image_url' => "https://static01.nyt.com/" . $news['multimedia'][0]['url'],
-                'description' => substr(strip_tags($news['lead_paragraph']), 0, 250),
+                'image_url' => self::IMAGE_HOST . $news['multimedia'][0]['url'],
+                'description' => $this->handleEncodedCharacters($news['lead_paragraph']),
                 'published_at' =>  Carbon::parse($news['pub_date'])->toDateTimeString(),
             ];
         }

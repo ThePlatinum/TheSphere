@@ -69,7 +69,7 @@ class Guardian implements CollectorInterface
                 'source_id' => $source->id,
                 'collector_id' => self::ID,
                 'image_url' => $news['fields']['thumbnail'],
-                'description' => substr(strip_tags($news['fields']['body']), 0, 250),
+                'description' => $this->handleEncodedCharacters($news['fields']['body']),
                 'published_at' =>  Carbon::parse($news['webPublicationDate'])->toDateTimeString(),
             ];
         }

@@ -23,4 +23,12 @@ trait NewsTrait
 
         return Feed::updateOrCreate($attributes, $feed);
     }
+
+    public function handleEncodedCharacters($content): string {
+
+        $encodedText = mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8');
+        $strippedText = strip_tags($encodedText);
+
+        return mb_substr($strippedText, 0, 250);
+    }
 }

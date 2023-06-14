@@ -67,7 +67,7 @@ class NewsApi implements CollectorInterface
             'source_id' => $source->id,
             'collector_id' => self::ID,
             'image_url' => $news['urlToImage'],
-            'description' => substr(strip_tags($news['description']), 0, 250),
+            'description' => $this->handleEncodedCharacters($news['description']),
             'published_at' =>  Carbon::parse($news['publishedAt'])->toDateTimeString(),
             // 'collector_identifier' => $news['id'] ?? null
         ];
