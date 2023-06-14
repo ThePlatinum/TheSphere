@@ -33,7 +33,7 @@ class Feed extends Model
     ];
 
     public function source() {
-        return $this->hasOne(Source::class);
+        return $this->belongsTo(Source::class);
     }
 
     public function categories() {

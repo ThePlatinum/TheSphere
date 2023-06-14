@@ -34,7 +34,7 @@ class Category extends Model
 
     public function getViewCountAttribute()
     {
-        return $this->feeds->sum('view');
+        return $this->feeds->sum('views');
     }
 
     public $appends = [

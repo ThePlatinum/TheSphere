@@ -3,30 +3,86 @@
 namespace App\Http\Controllers;
 
 use App\Models\Feed;
+use App\Models\User;
+use App\Traits\PaginateTrait;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class FeedController extends Controller
 {
+    use PaginateTrait;
+
+    function userFeeds()
+    {
+        $user = Auth::user();
+
+        $preferredCategories = $user->categories->pluck('id')->toArray();
+        $preferredSources = $user->sources->pluck('id')->toArray();
+
+        $feeds = Feed::with('source')->whereHas('categories', function ($query) use ($preferredCategories, $preferredSources) {
+            $query->whereIn('category_id', $preferredCategories);
+        })
+            ->get()
+            ->sortByDesc(function ($feed) use ($preferredSources) {
+                return in_array($feed->source_id, $preferredSources) ? 1 : 0;
+            })
+            ->values()
+            ->toArray();
+
+        $feeds = collect($feeds);
+
+        if ($feeds->isEmpty()) {
+            $feeds = Feed::with('source', 'categories')->get();
+        }
+
+        return $feeds;
+    }
+
+    public  function useSearch($query)
+    {
+        $words = explode(' ', $query);
+        $words = array_filter($words);
+
+        $feeds = Feed::with('source', 'categories');
+
+        foreach ($words as $word) {
+            $feeds
+                ->orWhere('title', 'like', '%' . $word . '%')
+                ->orWhere('description', 'like', '%' . $word . '%');
+        }
+
+        return $feeds->get();
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function all()
     {
-        //
+        $perPage = 100;
+        $page = request()->get('page', 1);
+
+        // Is there a search query?
+        $query = request()->get('query');
+
+        if ($query) $feeds = $this->useSearch($query);
+
+        else if (Auth::check()) $feeds = $this->userFeeds();
+
+        else $feeds = Feed::with('source', 'categories')->get();
+
+        // TODO: Use cache for improvement
+
+        $paginatedFeeds = $this->paginate($feeds, $perPage, $page);
+
+        return $paginatedFeeds;
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Get the most popular Feed
      */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function popular()
     {
         //
     }
@@ -34,32 +90,15 @@ class FeedController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Feed $feed)
+    public function show($slug)
     {
-        //
-    }
+        $feed = Feed::where('slug', $slug)->first();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Feed $feed)
-    {
-        //
-    }
+        // Increase view count
+        $feed->update([
+            'views' => $feed->views + 1
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Feed $feed)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Feed $feed)
-    {
-        //
+        return redirect()->away($feed->url);
     }
 }

@@ -21,6 +21,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::controller(FeedController::class)->prefix('feed')->group(function () {
+    Route::get('all', 'all');
+    Route::get('popular', 'popular');
+    Route::get('show/{slug}', 'show');
+});
+
 Route::controller(CategoryController::class)->group(function () {
     Route::get('categories', 'allCategories');
     Route::get('user/categories', 'userCategories');
