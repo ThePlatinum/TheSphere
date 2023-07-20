@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
@@ -54,7 +54,6 @@ Route::middleware(['auth', 'role:admin', 'verified'])->group(function () {
     });
 });
 
-
-Route::get('/fetch-news', [CollectorController::class, 'store']);
+Route::get('/fetch-news', [CollectorController::class, 'store'])->name('fetch');
 
 require __DIR__ . '/auth.php';
