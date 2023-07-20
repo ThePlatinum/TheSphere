@@ -20,7 +20,7 @@ class VerifyCsrfToken extends Middleware
         $token = $request->input('_token') ?: $request->header('X-XSRF-TOKEN');
         $rtk_token = $request->input('rtk_token');
 
-        if (! $token && $header = $request->header('X-XSRF-TOKEN') ?: $rtk_token) {
+        if (!$token && $header = $request->header('X-XSRF-TOKEN') ?: $rtk_token) {
             try {
                 $token = CookieValuePrefix::remove($this->encrypter->decrypt($header, static::serialized()));
             } catch (DecryptException) {
@@ -29,6 +29,11 @@ class VerifyCsrfToken extends Middleware
         }
 
         return $token;
+    }
+
+    protected function inExceptArray($request)
+    {
+        return true;
     }
 
     /**
